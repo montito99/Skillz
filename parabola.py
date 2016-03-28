@@ -56,15 +56,6 @@ def do_turn(game):
                     if (not game.is_occupied(i)):
                         game.set_sail(pirate, i)
                         found = True
-    """elif game.is_occupied((1,1)) and game.is_occupied((22,29)):
-        game.debug('hi')
-        for i in game.my_pirates():
-                pirate = i
-                if pirate == game.my_pirates()[3]:
-                        movePirate3(game,pirate)
-                else:
-                    treasure = find_closest_treasure(game, pirate)
-                    do_collect(game, pirate, treasure)"""
     else:
         cols = game.get_cols()
         middle = cols / 2
@@ -79,7 +70,7 @@ def do_turn(game):
                 for i in game.my_pirates():
                     pirate = i
                     if pirate == game.my_pirates()[3]:
-                        movePirate3(game,pirate)
+                        movePirateSmile(game,pirate)
                     else:
                         treasure = find_closest_treasure(game, pirate)
                         do_collect2(game, pirate, treasure)
@@ -87,7 +78,7 @@ def do_turn(game):
             for i in game.my_pirates():
                 pirate = i
                 if pirate == game.my_pirates()[3]:
-                    movePirate3(game,pirate)
+                    movePirateSmile(game,pirate)
                 else:
                     treasure = find_closest_treasure(game, pirate)
                     do_collect(game, pirate, treasure)
@@ -258,6 +249,42 @@ def movePiratestart(game,pirate):
                     if (not game.is_occupied(i)):
                         game.set_sail(pirate, i)
                         found = True
+
+def movePirateSmile(game, pirate):
+    cols = game.get_cols()
+    middle = cols / 2
+    if (pirate.initial_loc[1] > middle):
+        if(pirate.location == (17,4)):
+            game.debug(pirate.reload_turns)
+            try_attack(game, pirate)
+        else:
+            if(enemyinrange(game,pirate)):
+                game.debug(pirate.reload_turns)
+                try_attack(game,pirate)
+            else:
+                destinations = game.get_sail_options(pirate, (17,4), 1)
+                found = False
+                for i in destinations:
+                    if not found:
+                        if (not game.is_occupied(i)):
+                            game.set_sail(pirate, i)
+                            found = True
+    elif (pirate.initial_loc[1] < middle):
+        if(pirate.location == (4, 25)):
+            game.debug(pirate.reload_turns)
+            try_attack(game, pirate)
+        else:
+            if(enemyinrange(game,pirate)):
+                game.debug(pirate.reload_turns)
+                try_attack(game,pirate)
+            else:
+                destinations = game.get_sail_options(pirate, (4, 25), 1)
+                found = False
+                for i in destinations:
+                    if not found:
+                        if (not game.is_occupied(i)):
+                            game.set_sail(pirate, i)
+                            found = True
     
 
 
