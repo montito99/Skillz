@@ -1,11 +1,12 @@
 def do_turn(game):
     start_loc(game, game.my_pirates()[0])
-    game.debug(str(start_loc(game, game.my_pirates()[0])))
+    #game.debug(str(start_loc(game, game.my_pirates()[0])))
     game.debug(str(available_pirates(game)))
     if available_pirates(game) == 0:
         pirate = null
     if available_pirates(game) >= 1:
         do_pirate1(game, game.my_pirates()[0])
+        game.debug(find_closest_enemy(game, game.my_pirates()[0]))
     if available_pirates(game) >= 2:
         pirate1 = game.my_pirates()[1]
         do_pirate2(game, pirate1)
@@ -15,37 +16,10 @@ def do_turn(game):
     if available_pirates(game) >= 4:
         pirate3 = game.my_pirates()[3]
         do_pirate4(game, pirate3)
+
+def pirate_initial_estimated_parallel_loation(game, pirate):
+    return (pirate.initial_loc[0], pirate.initial_loc[1] - 20)
     
-
-def do_collect(game, pirate, treasure):
-    if not pirate.has_treasure:
-        if pirate == game.my_pirates()[0]:
-            if len(game.treasures()) > 0:
-                if(game.my_pirates()[1].has_treasure):
-                    destinations = game.get_sail_options(pirate, treasure.location, 3)
-                else:
-                    destinations = game.get_sail_options(pirate, treasure.location, 1)
-        if pirate == game.my_pirates()[1]:
-            if len(game.treasures()) > 0:
-                destinations = game.get_sail_options(pirate, treasure.location, 3)
-        elif pirate == game.my_pirates()[2]:
-            if(game.my_pirates()[3].location == (4, 25) or game.my_pirates()[3].location == (2, 6)):
-                if len(game.treasures()) > 0:
-                    destinations = game.get_sail_options(pirate, treasure.location, 2)
-            else:
-                if len(game.treasures()) > 0:
-                    if(game.my_pirates()[0].has_treasure and game.my_pirates()[1].has_treasure):
-                        destinations = game.get_sail_options(pirate, treasure.location, 3)
-                    else:
-                        destinations = game.get_sail_options(pirate, treasure.location, 1)
-
-    else:
-        destinations = game.get_sail_options(pirate, pirate.initial_loc, 1)
-    if len(game.treasures()) > 0:
-        game.set_sail(pirate, destinations[0])
-    else:
-        destinations = game.get_sail_options(pirate, pirate.initial_loc, 1)
-        game.set_sail(pirate, destinations[0])
     
 
 def find_closest_treasure(game, pirate):
@@ -53,6 +27,14 @@ def find_closest_treasure(game, pirate):
       distances = [ game.distance(pirate, treasure) for treasure in game.treasures() ]
       val, idx = min(((val, idx) for idx, val in enumerate(distances)))
       return game.treasures()[idx]
+    else:
+      return pirate.initial_loc
+
+def find_closest_enemy(game, pirate):
+    if len(game.treasures()) > 0:
+      distances = [ game.distance(pirate, enemy) for enemy in game.enemy_pirates() ]
+      val, idx = min(((val, idx) for idx, val in enumerate(distances)))
+      return game.enemy_pirates()[idx]
     else:
       return pirate.initial_loc
 
