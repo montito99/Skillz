@@ -1,3 +1,4 @@
+from math import ceil as up
 def do_turn(game):
 	game.debug(game.get_opponent_name())
 	moves_made = 0
@@ -24,32 +25,32 @@ def do_turn(game):
 		for pirate in game.all_my_pirates():
 			if enemy_attacker_inrange(game, pirate):
 				game.defend(pirate)
-				pirates_to_move.pop(pirates_to_move.index(pirate))
+				if pirate in pirates_to_move:
+					pirates_to_move.pop(pirates_to_move.index(pirate))
+				
 			bla = 1
 	game.debug("turn num: %d"%bla)
 	active_pirates = [pirate for pirate in pirates_to_move if pirate in game.my_sober_pirates() and not pirate.has_treasure]
 	
 	pirates_to_move = pirates_with_treasure + active_pirates
-	pirate_index = 1
+	game.debug(pirates_to_move)
 	for pirate in pirates_to_move:
+		pirate_index = 1
 		if pirate in game.my_sober_pirates():
 			enemy = closest_enemy_with_treasure(game, pirate)
 			if enemy:
 				game.debug("closest_enemy_with_treasure to pirate%d: %s" % (pirate.id, str(enemy)))
-			game.debug(pirates_to_move)
 			game.debug("%d moves_made" % moves_made)
 			if enemy_attacker_inrange(game, pirate) and pirate.defense_reload_turns == 0:
 				game.defend(pirate)
 			elif pirate in pirates_with_treasure:
-				dest_to_home = game.get_sail_options(pirate, pirate.initial_loc, pirate.carry_treasure_speed)[0]
-				moves_made += pirate.carry_treasure_speed
-				game.set_sail(pirate, dest_to_home)
+				if move_pirate(game, pirate, pirate.initial_loc, pirate.carry_treasure_speed):
+					moves_made += pirate.carry_treasure_speed
 			elif pirate in active_pirates and moves_made < 6:
 				moves_to_make = int((6-moves_made)/len(active_pirates)) if pirate_index < 6 else (6-moves_made)
-				treasure = game.get_sail_options(pirate, find_closest_treasure(game, pirate), moves_to_make)[0]
-				moves_made += moves_to_make
-				
-				game.set_sail(pirate, treasure)
+				treasure = find_closest_treasure(game, pirate)
+				if move_pirate(game, pirate, treasure, moves_to_make):
+					moves_made += moves_to_make
 	game.debug("%d moves_made in the end" % moves_made)
 	
 def find_closest_treasure(game, pirate):
@@ -74,7 +75,20 @@ def closest_enemy_with_treasure(game, pirate):
 		val, idx = min(((val, idx) for idx, val in enumerate(distances)))
 		return game.enemy_pirates()[idx]
 	return False
+	
+def move_pirate(game, pirate, destination, moves):
+	destinations = game.get_sail_options(pirate, destination, moves)
+	for dest in destinations:
+		if not game.is_occupied(dest):
+			game.set_sail(pirate, dest)
+			return True
+	return False
 	"""
+def can_attack(game, pirate, enemy, steps):
+	turns_to_enemy_home = up(game.distance(enemy, enemy.initial_loc) / enemy.carry_treasure_speed)
+	turns_to_enemy = up(game.distance(pirate, enemy) / pirate.steps)
+	return turns_to_enemy_home < turn_to_enemy - pirate.attack_radius
+
 
 def do_collect(game, pirate, treasure):
 	if not pirate.has_treasure:
