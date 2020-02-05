@@ -1,2 +1,1 @@
-This is Kfar Tasm and we will rule the arena!!!
-EXTREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAMMMMMMMMMMM!!!!!!!!
+Our team's bot the Skillz trutment
